@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SimLab - Probador de Fase 3</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+            background: #fdf2f8;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            max-width: 700px;
+            margin: auto;
+        }
+
+        h1 {
+            color: #db2777;
+            text-align: center;
+        }
+
+        .section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #f9a8d4;
+            border-radius: 6px;
+        }
+
+        button {
+            background: #db2777;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 5px;
+        }
+
+        button:hover {
+            background: #be185d;
+        }
+
+        pre {
+            background: #1f2937;
+            color: #10b981;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 12px;
+            height: 150px;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            margin-top: 5px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <h1>SimLab Simulation Tester 🧠</h1>
+        <p style="text-align: center; font-size: 14px; color: #6b7280;">Probador para el Motor de Simulación (Rol
+            Docente).</p>
+
+        <div class="section">
+            <label>1. Token de Administrador o Docente</label>
+            <input type="text" id="token" placeholder="Pega el token JWT aquí...">
+        </div>
+
+        <div class="section">
+            <label>2. ID del Examen (Obstenlo con el Probador 2)</label>
+            <input type="text" id="examId" placeholder="ID del examen...">
+            <button onclick="test('/api/exam/start/' + document.getElementById('examId').value, 'POST')">
+                🚀 Iniciar Simulación
+            </button>
+        </div>
+
+        <div class="section grid">
+            <div>
+                <label>3. ID del Intento (Attempt)</label>
+                <input type="text" id="attemptId" placeholder="Obtenido al iniciar...">
+            </div>
+            <div>
+                <label>4. ID de la Pregunta</label>
+                <input type="text" id="questionId" placeholder="ID de la pregunta...">
+            </div>
+            <div style="grid-column: span 2;">
+                <label>5. Respuesta (ID Opción o Texto)</label>
+                <input type="text" id="answer" placeholder="ID de la opción elegida o texto abierto...">
+                <button onclick="saveAnswer()">💾 Guardar Respuesta</button>
+            </div>
+        </div>
+
+        <div class="section">
+            <button style="background: #10b981;"
+                onclick="test('/api/exam/finish/' + document.getElementById('attemptId').value, 'POST')">
+                🏁 Finalizar y Evaluar
+            </button>
+            <button style="background: #3b82f6; margin-top: 10px;"
+                onclick="test('/api/exam/results/' + document.getElementById('attemptId').value, 'GET')">
+                📊 Ver Reporte por Competencia
+            </button>
+        </div>
+
+        <div class="section">
+            <label>Consola de Respuesta:</label>
+            <pre id="output">Los resultados aparecerán aquí...</pre>
+        </div>
+    </div>
+
+    <script>
+        async function test(path, method, body) {
+            const token = document.getElementById('token').value;
+            const output = document.getElementById('output');
+
+            if (!token) { alert('¡Pega el token!'); return; }
+            output.innerText = 'Procesando...';
+
+            try {
+                const response = await fetch('http://localhost:4000' + path, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: body ? JSON.stringify(body) : null
+                });
+                const data = await response.json();
+                output.innerText = JSON.stringify(data, null, 2);
+            } catch (error) {
+                output.innerText = 'Error: ' + error.message;
+            }
+        }
+
+        async function saveAnswer() {
+            const attemptId = document.getElementById('attemptId').value;
+            const questionId = document.getElementById('questionId').value;
+            const answerText = document.getElementById('answer').value;
+            await test('/api/exam/answer', 'POST', { attemptId, questionId, answerText });
+        }
+    </script>
+</body>
+
+</html>

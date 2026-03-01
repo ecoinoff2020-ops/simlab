@@ -1,0 +1,11 @@
+{
+  "name": "simlab",
+  "version": "1.0.0",
+  "description": "SimLab - Plataforma educativa",
+  "scripts": {
+    "backend": "npm run dev --prefix backend",
+    "frontend": "npm run dev --prefix frontend",
+    "dev": "start cmd /k npm run backend && start cmd /k npm run frontend"
+  },
+  "workspaces": []
+}

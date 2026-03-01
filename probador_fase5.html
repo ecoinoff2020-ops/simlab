@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SimLab - Probador de Fase 5 (Admin)</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+            background: #eff6ff;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: auto;
+        }
+
+        h1 {
+            color: #1e40af;
+            text-align: center;
+        }
+
+        .section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #bfdbfe;
+            border-radius: 6px;
+        }
+
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 5px;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        pre {
+            background: #1f2937;
+            color: #10b981;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 12px;
+            height: 200px;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <h1>SimLab Admin Analytics & Reports 📊</h1>
+        <p style="text-align: center; font-size: 14px; color: #6b7280;">Probador para estadísticas globales y
+            exportaciones (Rol Admin).</p>
+
+        <div class="section">
+            <label>1. Token de Administrador</label>
+            <input type="text" id="token" placeholder="Pega el token Admin aquí...">
+        </div>
+
+        <div class="section">
+            <label>2. ID del Examen (para Stats y Excel)</label>
+            <input type="text" id="examId" placeholder="ID del examen...">
+            <button onclick="fetchStats()">📈 Ver Estadísticas Globales</button>
+            <button style="background: #059669; margin-top: 10px;"
+                onclick="downloadFile('/api/admin/report/excel/' + document.getElementById('examId').value, 'reporte_masivo.xlsx')">
+                xlsx Exportar Excel Masivo
+            </button>
+        </div>
+
+        <div class="section">
+            <label>3. ID del Intento (para PDF Individual)</label>
+            <input type="text" id="attemptId" placeholder="ID del intento...">
+            <button style="background: #dc2626;"
+                onclick="downloadFile('/api/admin/report/pdf/' + document.getElementById('attemptId').value, 'reporte_individual.pdf')">
+                PDF Generar Reporte Individual
+            </button>
+        </div>
+
+        <div class="section">
+            <label>Consola de Respuesta (Stats):</label>
+            <pre id="output">Los resultados de las estadísticas aparecerán aquí...</pre>
+        </div>
+    </div>
+
+    <script>
+        const baseUrl = 'http://localhost:4000';
+
+        async function fetchStats() {
+            const token = document.getElementById('token').value;
+            const examId = document.getElementById('examId').value;
+            const output = document.getElementById('output');
+
+            if (!token || !examId) { alert('Token y Exam ID requeridos'); return; }
+            output.innerText = 'Cargando estadísticas...';
+
+            try {
+                const res = await fetch(`${baseUrl}/api/admin/stats/${examId}`, {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const data = await res.json();
+                output.innerText = JSON.stringify(data, null, 2);
+            } catch (e) {
+                output.innerText = 'Error: ' + e.message;
+            }
+        }
+
+        async function downloadFile(path, filename) {
+            const token = document.getElementById('token').value;
+            if (!token) { alert('Pega el token Admin'); return; }
+
+            try {
+                const res = await fetch(baseUrl + path, {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+
+                if (!res.ok) {
+                    const errorData = await res.json();
+                    alert('Error: ' + (errorData.message || 'Error al descargar archivo'));
+                    return;
+                }
+
+                const blob = await res.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+            } catch (e) {
+                alert('Error en la descarga: ' + e.message);
+            }
+        }
+    </script>
+</body>
+
+</html>
