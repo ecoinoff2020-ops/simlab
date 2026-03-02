@@ -23,7 +23,9 @@ app.use('/api/exams', examRoutes);
 app.get('/api/health', (_req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
-
+app.get("/", (req, res) => {
+  res.send("SimLab Backend funcionando 🚀");
+});
 // ── Start server ──────────────────────────────────────────────────────────
 app.listen(PORT, () => {
     console.log(`🚀 SimLab Backend corriendo en http://localhost:${PORT}`);
