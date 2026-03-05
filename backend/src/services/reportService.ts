@@ -106,7 +106,7 @@ export const generateMassiveExcel = async (examId: string): Promise<ExcelJS.Work
         { header: 'Desglose Competencias', key: 'competencies', width: 50 },
     ];
 
-    attempts.forEach(att => {
+    attempts.forEach((att: any) => {
         const breakdown = calculateCompetencyBreakdown(att);
         const competencyString = breakdown.map(b => `${b.competencyName}: ${b.percentage}%`).join(' | ');
 

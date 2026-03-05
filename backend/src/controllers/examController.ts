@@ -5,7 +5,7 @@ import { calculateCompetencyBreakdown } from '../services/analysisService';
 // ─── Iniciar Examen ────────────────────────────────────────────────────────
 
 export const startExam = async (req: Request, res: Response) => {
-    const { examId } = req.params;
+    const examId = req.params.examId as string;
     const userId = (req as any).user.id;
 
     try {
@@ -41,7 +41,7 @@ export const startExam = async (req: Request, res: Response) => {
         });
 
         // Limpiar preguntas (quitar correctAnswer)
-        const sanitizedQuestions = exam.questions.map(q => {
+        const sanitizedQuestions = (exam as any).questions.map((q: any) => {
             const { correctAnswer, ...rest } = q;
             return rest;
         });
@@ -64,7 +64,7 @@ export const startExam = async (req: Request, res: Response) => {
 // ─── Guardar Respuesta (Auto-guardado) ────────────────────────────────────
 
 export const saveAnswer = async (req: Request, res: Response) => {
-    const { attemptId } = req.params;
+    const attemptId = req.params.attemptId as string;
     const { questionId, answerText } = req.body;
     const userId = (req as any).user.id;
 
@@ -94,7 +94,7 @@ export const saveAnswer = async (req: Request, res: Response) => {
                 // Necesitamos un índice único compuesto en schema.prisma si queremos usar upsert por attemptId + questionId
                 // Pero como no lo tenemos, usaremos find + create/update
                 id: (await prisma.answer.findFirst({
-                    where: { attemptId, questionId }
+                    where: { attemptId, questionId } as any
                 }))?.id || '00000000-0000-0000-0000-000000000000'
             },
             update: { answerText },
@@ -115,7 +115,7 @@ export const saveAnswer = async (req: Request, res: Response) => {
 // ─── Finalizar Examen y Evaluar ───────────────────────────────────────────
 
 export const finishExam = async (req: Request, res: Response) => {
-    const { attemptId } = req.params;
+    const attemptId = req.params.attemptId as string;
     const userId = (req as any).user.id;
 
     try {
@@ -150,18 +150,18 @@ export const finishExam = async (req: Request, res: Response) => {
 
         let scoreTotal = 0;
         let correctAnswersCount = 0;
-        const totalQuestions = attempt.exam.questions.length;
+        const totalQuestions = (attempt as any).exam.questions.length;
 
         // Evaluación de cada respuesta
-        for (const question of attempt.exam.questions) {
-            const userAnswer = attempt.answers.find(a => a.questionId === question.id);
+        for (const question of (attempt as any).exam.questions) {
+            const userAnswer = (attempt as any).answers.find((a: any) => a.questionId === question.id);
             let isCorrect = false;
             let scoreObtained = 0;
 
             if (userAnswer) {
                 if (question.type === 'MULTIPLE_CHOICE' || question.type === 'TRUE_FALSE') {
                     // Check if answerText matches the correct option Id
-                    const correctOption = question.options.find(o => o.isCorrect);
+                    const correctOption = (question as any).options.find((o: any) => o.isCorrect);
                     if (correctOption && userAnswer.answerText === correctOption.id) {
                         isCorrect = true;
                         scoreObtained = question.points;
@@ -188,7 +188,7 @@ export const finishExam = async (req: Request, res: Response) => {
         }
 
         // Calcular puntaje máximo posible por puntos
-        const maxPoints = attempt.exam.questions.reduce((acc, q) => acc + q.points, 0);
+        const maxPoints = (attempt as any).exam.questions.reduce((acc: any, q: any) => acc + q.points, 0);
         const percentage = maxPoints > 0 ? (scoreTotal / maxPoints) * 100 : 0;
 
         // Determinar nivel
@@ -223,7 +223,7 @@ export const finishExam = async (req: Request, res: Response) => {
 // ─── Obtener Resultados Detallados ────────────────────────────────────────
 
 export const getResults = async (req: Request, res: Response) => {
-    const { attemptId } = req.params;
+    const attemptId = req.params.attemptId as string;
     const userId = (req as any).user.id;
 
     try {

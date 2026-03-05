@@ -57,7 +57,7 @@ export const listExams = async (req: Request, res: Response) => {
 };
 
 export const updateExam = async (req: Request, res: Response) => {
-    const { id } = req.params;
+    const id = req.params.id as string;
     const { title, description, durationMinutes } = req.body;
     try {
         const exam = await prisma.exam.update({
@@ -72,7 +72,7 @@ export const updateExam = async (req: Request, res: Response) => {
 };
 
 export const deleteExam = async (req: Request, res: Response) => {
-    const { id } = req.params;
+    const id = req.params.id as string;
     try {
         await prisma.exam.delete({ where: { id } });
         res.status(204).send();
@@ -145,7 +145,7 @@ export const createQuestion = async (req: Request, res: Response) => {
 };
 
 export const listQuestionsByExam = async (req: Request, res: Response) => {
-    const { examId } = req.params;
+    const examId = req.params.examId as string;
     try {
         const questions = await prisma.question.findMany({
             where: { examId },
@@ -159,7 +159,7 @@ export const listQuestionsByExam = async (req: Request, res: Response) => {
 };
 
 export const updateQuestion = async (req: Request, res: Response) => {
-    const { id } = req.params;
+    const id = req.params.id as string;
     const { questionText, points, correctAnswer } = req.body;
     try {
         const question = await prisma.question.update({
@@ -179,7 +179,7 @@ export const updateQuestion = async (req: Request, res: Response) => {
 };
 
 export const deleteQuestion = async (req: Request, res: Response) => {
-    const { id } = req.params;
+    const id = req.params.id as string;
     try {
         await prisma.question.delete({ where: { id } });
         res.status(204).send();
@@ -192,7 +192,7 @@ export const deleteQuestion = async (req: Request, res: Response) => {
 // ─── Estadísticas y Reportes ──────────────────────────────────────────────
 
 export const getGlobalStats = async (req: Request, res: Response) => {
-    const { examId } = req.params;
+    const examId = req.params.examId as string;
     try {
         const stats = await calculateGlobalStats(examId);
         res.json(stats);
@@ -203,7 +203,7 @@ export const getGlobalStats = async (req: Request, res: Response) => {
 };
 
 export const exportIndividualPDF = async (req: Request, res: Response) => {
-    const { attemptId } = req.params;
+    const attemptId = req.params.attemptId as string;
     try {
         const doc = await generateIndividualPDF(attemptId);
 
@@ -219,7 +219,7 @@ export const exportIndividualPDF = async (req: Request, res: Response) => {
 };
 
 export const exportMassiveExcel = async (req: Request, res: Response) => {
-    const { examId } = req.params;
+    const examId = req.params.examId as string;
     try {
         const workbook = await generateMassiveExcel(examId);
 
