@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import express from 'express';
+import express, { Request, Response } from 'express';
 import cors from 'cors';
 import authRoutes from './routes/authRoutes';
 import adminRoutes from './routes/adminRoutes';
@@ -20,15 +20,15 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/exams', examRoutes);
 
 // ── Health check ──────────────────────────────────────────────────────────
-app.get('/api/health', (_req, res) => {
-    res.json({ status: 'ok', timestamp: new Date().toISOString() });
+app.get('/api/health', (_req: Request, res: Response) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
-app.get("/", (req, res) => {
+app.get("/", (req: Request, res: Response) => {
   res.send("SimLab Backend funcionando 🚀");
 });
 // ── Start server ──────────────────────────────────────────────────────────
 app.listen(PORT, () => {
-    console.log(`🚀 SimLab Backend corriendo en http://localhost:${PORT}`);
+  console.log(`🚀 SimLab Backend corriendo en http://localhost:${PORT}`);
 });
 
 export default app;
