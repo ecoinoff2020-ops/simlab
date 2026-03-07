@@ -24,15 +24,18 @@ export default function RegisterPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (loading) return;
+
         setLoading(true);
         setError('');
 
         try {
             await api.post('/auth/register', formData);
+            // IMPORTANTE: Navegamos sin cambiar el estado de loading 
+            // para evitar errores de renderizado en el desmontaje.
             router.push('/login?registered=true');
         } catch (err: any) {
             setError(err.response?.data?.message || 'Error al crear la cuenta. Inténtalo de nuevo.');
-        } finally {
             setLoading(false);
         }
     };

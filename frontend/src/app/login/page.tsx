@@ -5,9 +5,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import api from '@/lib/api';
 import { motion } from 'framer-motion';
-import { Mail, Lock, CheckCircle2, AlertCircle, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Mail, Lock, CheckCircle2, AlertCircle, ArrowRight } from 'lucide-react';
 
-function LoginInputs({ formData, handleChange, loading, error, success, handleSubmit }: any) {
+function LoginInputs({ formData, handleChange, loading, handleSubmit }: any) {
     return (
         <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
@@ -79,7 +79,7 @@ function LoginWrapper() {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        if (searchParams.get('registered')) {
+        if (searchParams && searchParams.get('registered')) {
             setSuccess('¡Registro exitoso! Ya puedes iniciar sesión.');
         }
     }, [searchParams]);
@@ -90,18 +90,28 @@ function LoginWrapper() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (loading) return; // Evitar múltiples clics
+
         setLoading(true);
         setError('');
         setSuccess('');
 
         try {
             const { data } = await api.post('/auth/login', formData);
-            localStorage.setItem('token', data.token);
-            localStorage.setItem('user', JSON.stringify(data.user));
+
+            // Guardar tokens antes de cualquier cambio de estado o navegación
+            if (typeof window !== 'undefined') {
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('user', JSON.stringify(data.user));
+            }
+
+            // IMPORTANTE: Primero navegamos, y NO cambiamos el estado de loading
+            // para evitar re-renderizados mientras el componente se desmonta.
             router.push('/dashboard');
+
         } catch (err: any) {
+            // Solo si hay error volvemos a habilitar el formulario
             setError(err.response?.data?.message || 'Error al entrar');
-        } finally {
             setLoading(false);
         }
     };
@@ -116,6 +126,7 @@ function LoginWrapper() {
                 </div>
 
                 <motion.div
+                    key="login-decor"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     className="relative z-10 text-center max-w-md"
@@ -131,6 +142,7 @@ function LoginWrapper() {
             {/* Right Form */}
             <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12">
                 <motion.div
+                    key="login-form-container"
                     initial={{ opacity: 0, scale: 0.98 }}
                     animate={{ opacity: 1, scale: 1 }}
                     className="w-full max-w-md"
@@ -141,15 +153,22 @@ function LoginWrapper() {
                             <p className="text-slate-500 font-medium">Inicia sesión en tu cuenta.</p>
                         </div>
 
-                        {error && <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-2xl text-sm font-bold flex items-center gap-2"><AlertCircle size={18} /> {error}</div>}
-                        {success && <div className="mb-6 p-4 bg-emerald-50 text-emerald-600 rounded-2xl text-sm font-bold flex items-center gap-2"><CheckCircle2 size={18} /> {success}</div>}
+                        {error && (
+                            <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-2xl text-sm font-bold flex items-center gap-2">
+                                <AlertCircle size={18} /> {error}
+                            </div>
+                        )}
+
+                        {success && (
+                            <div className="mb-6 p-4 bg-emerald-50 text-emerald-600 rounded-2xl text-sm font-bold flex items-center gap-2">
+                                <CheckCircle2 size={18} /> {success}
+                            </div>
+                        )}
 
                         <LoginInputs
                             formData={formData}
                             handleChange={handleChange}
                             loading={loading}
-                            error={error}
-                            success={success}
                             handleSubmit={handleSubmit}
                         />
                     </div>
@@ -161,7 +180,7 @@ function LoginWrapper() {
 
 export default function LoginPage() {
     return (
-        <Suspense fallback={<div className="min-h-screen bg-slate-900 flex items-center justify-center text-white">Cargando...</div>}>
+        <Suspense fallback={<div className="min-h-screen bg-slate-900 flex items-center justify-center text-white font-bold">Cargando SimLab...</div>}>
             <LoginWrapper />
         </Suspense>
     );
