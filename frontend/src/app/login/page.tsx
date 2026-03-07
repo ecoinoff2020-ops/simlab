@@ -1,15 +1,11 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import api from '@/lib/api';
-import { motion } from 'framer-motion';
 import { Mail, Lock, CheckCircle2, AlertCircle, ArrowRight } from 'lucide-react';
 
 function LoginContent() {
-    const router = useRouter();
-    const searchParams = useSearchParams();
     const [mounted, setMounted] = useState(false);
     const [formData, setFormData] = useState({ email: '', password: '' });
     const [error, setError] = useState('');
@@ -18,10 +14,11 @@ function LoginContent() {
 
     useEffect(() => {
         setMounted(true);
-        if (searchParams && searchParams.get('registered')) {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('registered')) {
             setSuccess('¡Registro exitoso! Ya puedes iniciar sesión.');
         }
-    }, [searchParams]);
+    }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -38,36 +35,37 @@ function LoginContent() {
         try {
             const { data } = await api.post('auth/login', formData);
 
-            if (typeof window !== 'undefined') {
-                localStorage.setItem('token', data.token);
-                localStorage.setItem('user', JSON.stringify(data.user));
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('user', JSON.stringify(data.user));
 
-                // Forzamos una carga limpia de la página para evitar errores de reconciliación
-                // entre el DOM del Login y el DOM del Dashboard.
-                window.location.href = '/dashboard';
-            }
+            // REDIRECCIÓN DURA: Limpia el estado de React y el DOM por completo
+            window.location.href = '/dashboard';
         } catch (err: any) {
+            console.error('Login error:', err);
             setError(err.response?.data?.message || 'Email o contraseña incorrectos');
             setLoading(false);
         }
     };
 
-    if (!mounted) return null;
+    // Evitamos CUALQUIER renderizado hasta que esté montado en el cliente
+    if (!mounted) {
+        return <div className="min-h-screen bg-slate-50" />;
+    }
 
     return (
-        <div className="min-h-screen bg-slate-50 flex overflow-hidden">
-            {/* Panel Izquierdo */}
+        <div className="min-h-screen bg-slate-50 flex overflow-hidden" suppressHydrationWarning>
+            {/* Panel Izquierdo (Diseño estático sin animaciones para evitar errores de DOM) */}
             <div className="hidden lg:flex lg:w-1/2 bg-slate-900 items-center justify-center p-12 relative overflow-hidden">
                 <div className="absolute inset-0 opacity-30 pointer-events-none">
                     <div className="absolute top-[-20%] left-[-20%] w-[60%] h-[60%] bg-indigo-600 rounded-full blur-[120px]"></div>
                 </div>
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="relative z-10 text-center max-w-md">
+                <div className="relative z-10 text-center max-w-md">
                     <div className="w-16 h-16 bg-indigo-600 rounded-2xl mx-auto mb-8 flex items-center justify-center shadow-2xl">
                         <span className="text-white text-3xl font-black">S</span>
                     </div>
                     <h1 className="text-4xl font-black text-white mb-6">SimLab</h1>
                     <p className="text-slate-400">Plataforma de simulación docente.</p>
-                </motion.div>
+                </div>
             </div>
 
             {/* Panel Derecho */}
@@ -78,16 +76,19 @@ function LoginContent() {
                         <p className="text-slate-500 font-medium">Inicia sesión para continuar.</p>
                     </div>
 
-                    {error && (
-                        <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-2xl text-sm font-bold flex items-center gap-2 border border-red-100">
-                            <AlertCircle size={18} /> {error}
-                        </div>
-                    )}
-                    {success && (
-                        <div className="mb-6 p-4 bg-emerald-50 text-emerald-600 rounded-2xl text-sm font-bold flex items-center gap-2 border border-emerald-100">
-                            <CheckCircle2 size={18} /> {success}
-                        </div>
-                    )}
+                    {/* Contenedores de mensaje estáticos para evitar manipulación dinámica del DOM que cause removeChild errors */}
+                    <div className="min-h-[60px]">
+                        {error && (
+                            <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-2xl text-sm font-bold flex items-center gap-2 border border-red-100">
+                                <AlertCircle size={18} /> {error}
+                            </div>
+                        )}
+                        {success && (
+                            <div className="mb-6 p-4 bg-emerald-50 text-emerald-600 rounded-2xl text-sm font-bold flex items-center gap-2 border border-emerald-100">
+                                <CheckCircle2 size={18} /> {success}
+                            </div>
+                        )}
+                    </div>
 
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="space-y-2">
@@ -143,7 +144,7 @@ function LoginContent() {
 
 export default function LoginPage() {
     return (
-        <Suspense fallback={null}>
+        <Suspense fallback={<div className="min-h-screen bg-slate-50" />}>
             <LoginContent />
         </Suspense>
     );
