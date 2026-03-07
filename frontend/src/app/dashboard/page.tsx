@@ -1,24 +1,29 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function DashboardPage() {
     const router = useRouter();
+    const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
+        setMounted(true);
         const storedUser = localStorage.getItem('user');
         if (storedUser) {
             const user = JSON.parse(storedUser);
+            // Usamos replace para no ensuciar el historial con la página de carga
             if (user.role === 'admin') {
-                router.push('/dashboard/admin');
+                router.replace('/dashboard/admin');
             } else {
-                router.push('/dashboard/docente');
+                router.replace('/dashboard/docente');
             }
         } else {
-            router.push('/login');
+            router.replace('/login');
         }
     }, [router]);
+
+    if (!mounted) return null;
 
     return (
         <div className="flex items-center justify-center min-h-[60vh]">

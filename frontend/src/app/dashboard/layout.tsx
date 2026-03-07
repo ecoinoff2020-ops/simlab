@@ -26,11 +26,13 @@ export default function DashboardLayout({
     children: React.ReactNode;
 }) {
     const [user, setUser] = useState<UserData | null>(null);
+    const [mounted, setMounted] = useState(false);
     const router = useRouter();
     const pathname = usePathname();
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
     useEffect(() => {
+        setMounted(true);
         const storedUser = localStorage.getItem('user');
         const token = localStorage.getItem('token');
 
@@ -48,7 +50,7 @@ export default function DashboardLayout({
         router.push('/login');
     };
 
-    if (!user) return null;
+    if (!mounted || !user) return null;
 
     const adminMenu = [
         { name: 'Resumen', icon: LayoutDashboard, href: '/dashboard/admin' },
