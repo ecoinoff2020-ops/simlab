@@ -80,7 +80,13 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         }
 
         // Generar JWT
-        const secret = process.env.JWT_SECRET as string;
+        const secret = process.env.JWT_SECRET;
+        if (!secret) {
+            console.error('[login] ERROR: JWT_SECRET no está configurado en las variables de entorno');
+            res.status(500).json({ message: 'Error de configuración del servidor (JWT)' });
+            return;
+        }
+
         const token = jwt.sign(
             { id: user.id, email: user.email, role: user.role, name: user.name },
             secret,
@@ -97,9 +103,22 @@ export const login = async (req: Request, res: Response): Promise<void> => {
                 role: user.role,
             },
         });
-    } catch (error) {
-        console.error('[login]', error);
-        res.status(500).json({ message: 'Error interno del servidor' });
+    } catch (error: any) {
+        console.error('[login] Error catastrófico:', error);
+
+        // Si el error es de Prisma (base de datos)
+        if (error.code) {
+            res.status(500).json({
+                message: 'Error de conexión con la base de datos',
+                code: error.code
+            });
+            return;
+        }
+
+        res.status(500).json({
+            message: 'Error interno del servidor',
+            detail: error.message
+        });
     }
 };
 
