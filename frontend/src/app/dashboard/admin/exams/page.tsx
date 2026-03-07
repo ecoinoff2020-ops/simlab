@@ -32,7 +32,7 @@ export default function AdminExamsPage() {
     useEffect(() => {
         const fetchExams = async () => {
             try {
-                const res = await api.get('/admin/exams');
+                const res = await api.get('admin/exams');
                 setExams(res.data);
             } catch (error) {
                 console.error('Error fetching exams', error);

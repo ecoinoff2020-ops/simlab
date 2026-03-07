@@ -30,8 +30,8 @@ export default function DocenteDashboard() {
         const fetchData = async () => {
             try {
                 const [examsRes, statsRes] = await Promise.all([
-                    api.get('/exams'),
-                    api.get('/exams/my-stats')
+                    api.get('exams'),
+                    api.get('exams/my-stats')
                 ]);
                 setExams(examsRes.data);
                 setStats(statsRes.data);

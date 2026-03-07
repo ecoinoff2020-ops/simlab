@@ -29,7 +29,7 @@ export default function AdminDashboard() {
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
-                const res = await api.get('/admin/dashboard-stats');
+                const res = await api.get('admin/dashboard-stats');
                 setStats(res.data);
             } catch (error) {
                 console.error('Error fetching admin dashboard data', error);

@@ -39,7 +39,7 @@ export default function AdminStatsPage() {
     useEffect(() => {
         const fetchExams = async () => {
             try {
-                const res = await api.get('/admin/exams');
+                const res = await api.get('admin/exams');
                 setExams(res.data);
                 if (res.data.length > 0) {
                     setSelectedExam(res.data[0].id);
@@ -57,7 +57,7 @@ export default function AdminStatsPage() {
         const fetchStats = async () => {
             setLoading(true);
             try {
-                const res = await api.get(`/admin/stats/${selectedExam}`);
+                const res = await api.get(`admin/stats/${selectedExam}`);
                 setStats(res.data);
             } catch (err) {
                 console.error('Error fetching stats', err);
@@ -71,7 +71,7 @@ export default function AdminStatsPage() {
     const downloadExcel = async () => {
         if (!selectedExam) return;
         try {
-            const res = await api.get(`/admin/report/excel/${selectedExam}`, {
+            const res = await api.get(`admin/report/excel/${selectedExam}`, {
                 responseType: 'blob'
             });
             const url = window.URL.createObjectURL(new Blob([res.data]));

@@ -22,7 +22,7 @@ export default function ResultDetailPage() {
             try {
                 // En un caso real, el backend debería permitir GET /results/:id
                 // Para este prototipo, simularemos que lo obtenemos de la lógica de análisis
-                const res = await api.get(`/exams/${id}/results`);
+                const res = await api.get(`exams/${id}/results`);
                 setResult({
                     attemptId: id,
                     scoreTotal: 0,
@@ -51,7 +51,7 @@ export default function ResultDetailPage() {
     const downloadPDF = async () => {
         setDownloading(true);
         try {
-            const res = await api.get(`/exams/report/pdf/${id}`, {
+            const res = await api.get(`exams/report/pdf/${id}`, {
                 responseType: 'blob'
             });
             const url = window.URL.createObjectURL(new Blob([res.data]));

@@ -32,7 +32,7 @@ export default function CompetenciesPage() {
 
     const fetchCompetencies = async () => {
         try {
-            const res = await api.get('/admin/competencies');
+            const res = await api.get('admin/competencies');
             setCompetencies(res.data);
         } catch (error) {
             console.error('Error fetching competencies', error);
@@ -44,7 +44,7 @@ export default function CompetenciesPage() {
     const handleCreate = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await api.post('/admin/competencies', { name, description });
+            await api.post('admin/competencies', { name, description });
             setName('');
             setDescription('');
             setShowForm(false);

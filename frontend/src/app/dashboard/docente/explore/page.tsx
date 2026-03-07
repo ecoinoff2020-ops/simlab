@@ -25,7 +25,7 @@ export default function ExploreExams() {
     useEffect(() => {
         const fetchExams = async () => {
             try {
-                const res = await api.get('/exams');
+                const res = await api.get('exams');
                 setExams(res.data);
                 setFilteredExams(res.data);
             } catch (error) {

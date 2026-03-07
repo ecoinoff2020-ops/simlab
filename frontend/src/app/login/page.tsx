@@ -36,7 +36,7 @@ function LoginContent() {
         setSuccess('');
 
         try {
-            const { data } = await api.post('/auth/login', formData);
+            const { data } = await api.post('auth/login', formData);
 
             if (typeof window !== 'undefined') {
                 localStorage.setItem('token', data.token);

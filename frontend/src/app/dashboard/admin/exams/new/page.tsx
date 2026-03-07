@@ -20,7 +20,7 @@ export default function NewExamPage() {
         e.preventDefault();
         setLoading(true);
         try {
-            await api.post('/admin/exams', formData);
+            await api.post('admin/exams', formData);
             router.push('/dashboard/admin/exams');
         } catch (error) {
             console.error('Error creating exam', error);

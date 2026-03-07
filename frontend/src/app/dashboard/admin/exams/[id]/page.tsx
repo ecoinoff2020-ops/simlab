@@ -73,9 +73,9 @@ export default function ExamDetailPage() {
         const fetchData = async () => {
             try {
                 const [examRes, questionsRes, compRes] = await Promise.all([
-                    api.get(`/admin/exams`), // This usually lists all, we need a single one if exists
-                    api.get(`/admin/questions/exam/${examId}`),
-                    api.get('/admin/competencies')
+                    api.get(`admin/exams`), // This usually lists all, we need a single one if exists
+                    api.get(`admin/questions/exam/${examId}`),
+                    api.get('admin/competencies')
                 ]);
 
                 // Assuming we can find the exam from the list for now if there's no /admin/exams/:id
@@ -127,7 +127,7 @@ export default function ExamDetailPage() {
                 options: qType === 'MULTIPLE_CHOICE' ? qOptions : []
             };
 
-            const res = await api.post('/admin/questions', payload);
+            const res = await api.post('admin/questions', payload);
             setQuestions([...questions, res.data]);
             setShowForm(false);
             resetForm();
@@ -140,7 +140,7 @@ export default function ExamDetailPage() {
     const handleDeleteQuestion = async (qId: string) => {
         if (!confirm('¿Eliminar esta pregunta?')) return;
         try {
-            await api.delete(`/admin/questions/${qId}`);
+            await api.delete(`admin/questions/${qId}`);
             setQuestions(questions.filter(q => q.id !== qId));
         } catch (error) {
             alert('Error al eliminar la pregunta');

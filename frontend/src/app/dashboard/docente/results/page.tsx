@@ -29,7 +29,7 @@ export default function DocenteResultsPage() {
     useEffect(() => {
         const fetchResults = async () => {
             try {
-                const res = await api.get('/exams/my-history');
+                const res = await api.get('exams/my-history');
                 setResults(res.data);
             } catch (error) {
                 console.error('Error fetching results', error);
@@ -133,7 +133,7 @@ export default function DocenteResultsPage() {
                                             <button
                                                 onClick={async () => {
                                                     try {
-                                                        const res = await api.get(`/exams/report/pdf/${result.id}`, { responseType: 'blob' });
+                                                        const res = await api.get(`exams/report/pdf/${result.id}`, { responseType: 'blob' });
                                                         const url = window.URL.createObjectURL(new Blob([res.data]));
                                                         const link = document.createElement('a');
                                                         link.href = url;

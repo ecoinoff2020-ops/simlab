@@ -28,7 +28,7 @@ export default function SimulationPage() {
         if (!result?.attemptId) return;
         setDownloading(true);
         try {
-            const res = await api.get(`/admin/report/pdf/${result.attemptId}`, {
+            const res = await api.get(`admin/report/pdf/${result.attemptId}`, {
                 responseType: 'blob'
             });
             const url = window.URL.createObjectURL(new Blob([res.data]));

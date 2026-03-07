@@ -42,7 +42,7 @@ export default function SimulationInterface({ examId, onFinish }: SimulationInte
     useEffect(() => {
         const startSimulation = async () => {
             try {
-                const res = await api.post(`/exams/${examId}/start`);
+                const res = await api.post(`exams/${examId}/start`);
                 const { attemptId, questions, exam } = res.data;
 
                 setAttemptId(attemptId);
@@ -61,7 +61,7 @@ export default function SimulationInterface({ examId, onFinish }: SimulationInte
     const handleFinish = useCallback(async () => {
         setLoading(true);
         try {
-            const res = await api.post(`/exams/${attemptId}/finish`);
+            const res = await api.post(`exams/${attemptId}/finish`);
             onFinish(res.data);
         } catch (err) {
             setError('Error al finalizar el examen');
@@ -89,7 +89,7 @@ export default function SimulationInterface({ examId, onFinish }: SimulationInte
     const saveCurrentAnswer = useCallback(async (questionId: string, answer: string) => {
         setSaving(true);
         try {
-            await api.post(`/exams/${attemptId}/answer`, {
+            await api.post(`exams/${attemptId}/answer`, {
                 questionId,
                 answerText: answer
             });

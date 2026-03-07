@@ -30,7 +30,7 @@ export default function RegisterPage() {
         setError('');
 
         try {
-            await api.post('/auth/register', formData);
+            await api.post('auth/register', formData);
             // IMPORTANTE: Navegamos sin cambiar el estado de loading 
             // para evitar errores de renderizado en el desmontaje.
             router.push('/login?registered=true');

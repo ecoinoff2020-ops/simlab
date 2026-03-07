@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://simlab-backend-q4cn.onrender.com/api',
+    baseURL: (process.env.NEXT_PUBLIC_API_URL || 'https://simlab-backend-q4cn.onrender.com/api').replace(/\/$/, '') + '/',
     headers: {
         'Content-Type': 'application/json',
     },
