@@ -4,6 +4,21 @@ import { validationResult } from 'express-validator';
 import { calculateGlobalStats } from '../services/statsService';
 import { generateIndividualPDF, generateMassiveExcel } from '../services/reportService';
 
+// ─── Users ──────────────────────────────────────────────────────────────
+
+export const listUsers = async (req: Request, res: Response) => {
+    try {
+        const users = await prisma.user.findMany({
+            select: { id: true, name: true, email: true, role: true, created_at: true },
+            orderBy: { created_at: 'desc' }
+        });
+        res.json(users);
+    } catch (error) {
+        console.error('[listUsers]', error);
+        res.status(500).json({ message: 'Error al listar usuarios' });
+    }
+};
+
 // ─── Competencies ──────────────────────────────────────────────────────────
 
 export const createCompetency = async (req: Request, res: Response) => {

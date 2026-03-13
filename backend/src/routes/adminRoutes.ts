@@ -5,7 +5,7 @@ import {
     createCompetency, listCompetencies,
     createQuestion, listQuestionsByExam, updateQuestion, deleteQuestion,
     getGlobalStats, exportIndividualPDF, exportMassiveExcel,
-    getDashboardStats
+    getDashboardStats, listUsers
 } from '../controllers/adminController';
 import { authMiddleware } from '../middlewares/authMiddleware';
 import { requireRole } from '../middlewares/roleMiddleware';
@@ -47,5 +47,8 @@ router.get('/stats/:examId', getGlobalStats);
 router.get('/report/pdf/:attemptId', exportIndividualPDF);
 router.get('/report/excel/:examId', exportMassiveExcel);
 router.get('/dashboard-stats', getDashboardStats);
+
+// ─── Usuarios ──────────────────────────────────────────────────────────────
+router.get('/users', listUsers);
 
 export default router;

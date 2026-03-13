@@ -107,6 +107,19 @@ export default function AdminDashboard() {
                                 <ArrowRight size={18} className="text-indigo-400 group-hover:translate-x-1 transition-transform" />
                             </Link>
 
+                            <Link href="/dashboard/admin/users" className="flex items-center justify-between p-4 bg-emerald-50 rounded-xl hover:bg-emerald-100 transition-colors group">
+                                <div className="flex items-center gap-4">
+                                    <div className="p-2 bg-white rounded-lg shadow-sm">
+                                        <Users size={20} className="text-emerald-600" />
+                                    </div>
+                                    <div>
+                                        <h4 className="font-bold text-slate-900">Gestionar Usuarios</h4>
+                                        <p className="text-xs text-slate-500">Crear cuentas de docentes o admin</p>
+                                    </div>
+                                </div>
+                                <ArrowRight size={18} className="text-emerald-400 group-hover:translate-x-1 transition-transform" />
+                            </Link>
+
                             <Link href="/dashboard/admin/competencies" className="flex items-center justify-between p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors group">
                                 <div className="flex items-center gap-4">
                                     <div className="p-2 bg-white rounded-lg shadow-sm">
