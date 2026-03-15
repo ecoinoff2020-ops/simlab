@@ -60,8 +60,8 @@ function LoginContent() {
                     <div className="absolute top-[-20%] left-[-20%] w-[60%] h-[60%] bg-indigo-600 rounded-full blur-[120px]"></div>
                 </div>
                 <div className="relative z-10 text-center max-w-md">
-                    <div className="w-16 h-16 bg-indigo-600 rounded-2xl mx-auto mb-8 flex items-center justify-center shadow-2xl">
-                        <span className="text-white text-3xl font-black">S</span>
+                    <div className="w-24 h-24 bg-white rounded-[2rem] mx-auto mb-8 flex items-center justify-center shadow-2xl p-4">
+                        <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
                     </div>
                     <h1 className="text-4xl font-black text-white mb-6">SimLab</h1>
                     <p className="text-slate-400">Plataforma de simulación docente.</p>
