@@ -126,7 +126,7 @@ export const finishExam = async (req: Request, res: Response) => {
                 exam: {
                     include: {
                         questions: {
-                            include: { options: true }
+                            include: { competency: true, options: true }
                         }
                     }
                 }
