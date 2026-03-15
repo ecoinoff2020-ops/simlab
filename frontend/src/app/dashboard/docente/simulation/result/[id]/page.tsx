@@ -23,22 +23,7 @@ export default function ResultDetailPage() {
                 // En un caso real, el backend debería permitir GET /results/:id
                 // Para este prototipo, simularemos que lo obtenemos de la lógica de análisis
                 const res = await api.get(`exams/${id}/results`);
-                setResult({
-                    attemptId: id,
-                    scoreTotal: 0,
-                    levelEstimated: 'Bajo',
-                    correctAnswers: 0,
-                    totalQuestions: 1,
-                    examTitle: 'Primer Parcial Simulación',
-                    breakdownByCompetency: [
-                        {
-                            competencyName: 'Anatomía Humana',
-                            percentage: 0,
-                            totalQuestions: 1,
-                            feedback: 'Se requiere estudio profundo de este módulo.'
-                        }
-                    ]
-                });
+                setResult(res.data);
             } catch (err) {
                 console.error('Error fetching result', err);
             } finally {

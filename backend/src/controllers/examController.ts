@@ -209,10 +209,12 @@ export const finishExam = async (req: Request, res: Response) => {
 
         res.json({
             message: 'Examen finalizado',
+            attemptId: updatedAttempt.id,
             scoreTotal: updatedAttempt.scoreTotal,
             levelEstimated: updatedAttempt.levelEstimated,
             totalQuestions,
-            correctAnswers: correctAnswersCount
+            correctAnswers: correctAnswersCount,
+            breakdownByCompetency: calculateCompetencyBreakdown(attempt)
         });
     } catch (error) {
         console.error('[finishExam]', error);
@@ -259,8 +261,12 @@ export const getResults = async (req: Request, res: Response) => {
         const breakdownByCompetency = calculateCompetencyBreakdown(attempt);
 
         res.json({
+            attemptId: attempt.id,
+            examTitle: attempt.exam.title,
             scoreTotal: attempt.scoreTotal,
             levelEstimated: attempt.levelEstimated,
+            correctAnswers: attempt.answers.filter((a: any) => a.isCorrect).length,
+            totalQuestions: attempt.exam.questions.length,
             breakdownByCompetency
         });
     } catch (error) {
