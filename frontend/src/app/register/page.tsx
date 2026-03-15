@@ -55,7 +55,7 @@ export default function RegisterPage() {
                 </div>
 
                 <div className="relative z-10 max-w-lg text-center">
-                    <div className="mb-8 inline-flex items-center justify-center w-24 h-24 bg-white rounded-[2.5rem] shadow-2xl p-4">
+                    <div className="mb-8 inline-flex items-center justify-center w-28 h-28 bg-white rounded-[2.5rem] shadow-2xl p-5 border border-slate-100/50">
                         <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
                     </div>
                     <h2 className="text-4xl font-black text-white tracking-tight leading-tight mb-6">

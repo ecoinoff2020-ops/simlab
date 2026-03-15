@@ -72,7 +72,7 @@ export default function DashboardLayout({
             {/* Sidebar */}
             <aside className={`bg-slate-900 text-white w-64 flex-shrink-0 transition-all duration-300 ${isSidebarOpen ? '' : '-ml-64'}`}>
                 <div className="p-6 flex items-center gap-3">
-                    <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center p-1.5 shadow-lg ring-1 ring-slate-800">
+                    <div className="w-11 h-11 bg-white rounded-xl flex items-center justify-center p-2 shadow-lg ring-1 ring-slate-800">
                         <img src="/logo.png" alt="SimLab Logo" className="w-full h-full object-contain" />
                     </div>
                     <div>

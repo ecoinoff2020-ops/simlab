@@ -26,7 +26,7 @@ export default function Home() {
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 px-4 py-12 transition-colors duration-300">
       <main className="max-w-4xl w-full text-center space-y-8 animate-in fade-in zoom-in duration-700">
         <div className="flex justify-center flex-col items-center gap-4">
-          <div className="w-24 h-24 p-3 bg-white rounded-3xl shadow-2xl transform hover:scale-105 transition-transform duration-300 flex items-center justify-center border border-slate-100">
+          <div className="w-28 h-28 p-5 bg-white rounded-[2rem] shadow-2xl transform hover:scale-105 transition-transform duration-300 flex items-center justify-center border border-slate-100">
             <img src="/logo.png" alt="SimLab Logo" className="w-full h-full object-contain" />
           </div>
           <h1 className="text-4xl font-black text-indigo-600 tracking-wider">SimLab</h1>

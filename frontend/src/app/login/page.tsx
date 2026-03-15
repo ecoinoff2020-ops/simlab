@@ -60,7 +60,7 @@ function LoginContent() {
                     <div className="absolute top-[-20%] left-[-20%] w-[60%] h-[60%] bg-indigo-600 rounded-full blur-[120px]"></div>
                 </div>
                 <div className="relative z-10 text-center max-w-md">
-                    <div className="w-24 h-24 bg-white rounded-[2rem] mx-auto mb-8 flex items-center justify-center shadow-2xl p-4">
+                    <div className="w-28 h-28 bg-white rounded-[2.5rem] mx-auto mb-8 flex items-center justify-center shadow-2xl p-5 border border-slate-100/50">
                         <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
                     </div>
                     <h1 className="text-4xl font-black text-white mb-6">SimLab</h1>
