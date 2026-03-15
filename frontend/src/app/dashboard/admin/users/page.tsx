@@ -9,7 +9,9 @@ import {
     UserCircle,
     Mail,
     Shield,
-    Lock
+    Lock,
+    Edit2,
+    Trash2
 } from 'lucide-react';
 import api from '@/lib/api';
 import Link from 'next/link';
@@ -34,6 +36,9 @@ export default function UsersPage() {
     const [password, setPassword] = useState('');
     const [role, setRole] = useState('docente');
 
+    const [isEditing, setIsEditing] = useState(false);
+    const [editId, setEditId] = useState<string | null>(null);
+
     useEffect(() => {
         fetchUsers();
     }, []);
@@ -49,21 +54,61 @@ export default function UsersPage() {
         }
     };
 
-    const handleCreate = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await api.post('auth/register', { name, email, password, role });
+            if (isEditing && editId) {
+                const payload: any = { name, email, role };
+                if (password) payload.password = password; // Only update if typed
+                await api.put(`admin/users/${editId}`, payload);
+                alert('Usuario actualizado exitosamente');
+            } else {
+                await api.post('auth/register', { name, email, password, role });
+                alert('Usuario creado exitosamente');
+            }
             // Reset form
             setName('');
             setEmail('');
             setPassword('');
             setRole('docente');
             setShowForm(false);
+            setIsEditing(false);
+            setEditId(null);
             fetchUsers();
-            alert('Usuario creado exitosamente');
         } catch (error: any) {
-            alert(error.response?.data?.message || 'Error al crear usuario');
+            alert(error.response?.data?.message || 'Error al guardar usuario');
         }
+    };
+
+    const handleEditClick = (user: User) => {
+        setName(user.name);
+        setEmail(user.email);
+        setRole(user.role);
+        setPassword('');
+        setEditId(user.id);
+        setIsEditing(true);
+        setShowForm(true);
+    };
+
+    const handleDelete = async (userId: string) => {
+        if (!window.confirm('¿Estás seguro de que deseas eliminar este usuario?')) return;
+        try {
+            await api.delete(`admin/users/${userId}`);
+            alert('Usuario eliminado exitosamente');
+            fetchUsers();
+        } catch (error: any) {
+            alert(error.response?.data?.message || 'Error al eliminar usuario');
+        }
+    };
+
+    const handleCancelForm = () => {
+        setIsEditing(false);
+        setEditId(null);
+        setShowForm(false);
+        setName('');
+        setEmail('');
+        setPassword('');
+        setRole('docente');
     };
 
     if (loading) return (
@@ -108,10 +153,10 @@ export default function UsersPage() {
                         <div className="p-3 bg-emerald-50 rounded-xl">
                             <UserCircle size={24} className="text-emerald-600" />
                         </div>
-                        <h2 className="text-xl font-bold text-slate-900">Crear Nueva Cuenta</h2>
+                        <h2 className="text-xl font-bold text-slate-900">{isEditing ? 'Editar Cuenta' : 'Crear Nueva Cuenta'}</h2>
                     </div>
 
-                    <form onSubmit={handleCreate} className="space-y-6">
+                    <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">
                                 <label className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
@@ -141,14 +186,14 @@ export default function UsersPage() {
                             </div>
                             <div className="space-y-2">
                                 <label className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                                    <Lock size={14} /> Contraseña Inicial
+                                    <Lock size={14} /> {isEditing ? 'Nueva Contraseña (Opcional)' : 'Contraseña Inicial'}
                                 </label>
                                 <input
                                     type="password"
-                                    required
+                                    required={!isEditing}
                                     minLength={6}
                                     className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-emerald-500 font-medium"
-                                    placeholder="Mínimo 6 caracteres"
+                                    placeholder={isEditing ? 'Dejar en blanco para no cambiar' : 'Mínimo 6 caracteres'}
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                 />
@@ -168,11 +213,11 @@ export default function UsersPage() {
                             </div>
                         </div>
                         <div className="flex justify-end gap-4 pt-4">
-                            <button type="button" onClick={() => setShowForm(false)} className="px-6 py-3 text-slate-500 font-bold hover:bg-slate-50 rounded-xl transition-colors">
+                            <button type="button" onClick={handleCancelForm} className="px-6 py-3 text-slate-500 font-bold hover:bg-slate-50 rounded-xl transition-colors">
                                 Cancelar
                             </button>
                             <button type="submit" className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-emerald-500/30 flex items-center gap-2 transition-colors">
-                                <Save size={18} /> Crear Usuario
+                                <Save size={18} /> {isEditing ? 'Guardar Cambios' : 'Crear Usuario'}
                             </button>
                         </div>
                     </form>
@@ -187,6 +232,7 @@ export default function UsersPage() {
                                 <th className="py-4 px-6 text-xs font-bold text-slate-500 uppercase tracking-widest">Usuario</th>
                                 <th className="py-4 px-6 text-xs font-bold text-slate-500 uppercase tracking-widest">Rol</th>
                                 <th className="py-4 px-6 text-xs font-bold text-slate-500 uppercase tracking-widest">Fecha de Registro</th>
+                                <th className="py-4 px-6 text-xs font-bold text-slate-500 uppercase tracking-widest text-right">Acciones</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
@@ -210,8 +256,8 @@ export default function UsersPage() {
                                     </td>
                                     <td className="py-4 px-6">
                                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${user.role === 'admin'
-                                                ? 'bg-indigo-100 text-indigo-800'
-                                                : 'bg-emerald-100 text-emerald-800'
+                                            ? 'bg-indigo-100 text-indigo-800'
+                                            : 'bg-emerald-100 text-emerald-800'
                                             }`}>
                                             {user.role === 'admin' ? 'Administrador' : 'Docente'}
                                         </span>
@@ -222,6 +268,24 @@ export default function UsersPage() {
                                             month: 'long',
                                             day: 'numeric'
                                         })}
+                                    </td>
+                                    <td className="py-4 px-6">
+                                        <div className="flex items-center justify-end gap-2">
+                                            <button
+                                                onClick={() => handleEditClick(user)}
+                                                className="p-2 text-indigo-500 hover:bg-indigo-50 rounded-lg transition-colors group"
+                                                title="Editar"
+                                            >
+                                                <Edit2 size={18} className="group-hover:scale-110 transition-transform" />
+                                            </button>
+                                            <button
+                                                onClick={() => handleDelete(user.id)}
+                                                className="p-2 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors group"
+                                                title="Eliminar"
+                                            >
+                                                <Trash2 size={18} className="group-hover:scale-110 transition-transform" />
+                                            </button>
+                                        </div>
                                     </td>
                                 </motion.tr>
                             ))}

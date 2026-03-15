@@ -148,6 +148,20 @@ export default function AdminDashboard() {
                             <BarChart3 size={200} />
                         </div>
                     </div>
+
+                    <div className="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden group mt-6">
+                        <div className="relative z-10">
+                            <h3 className="text-2xl font-bold mb-2">Gestión de Usuarios</h3>
+                            <p className="text-emerald-100 mb-6 max-w-sm">Administra las cuentas de docentes y administradores, edita sus perfiles o elimínalos del sistema.</p>
+                            <Link href="/dashboard/admin/users" className="inline-flex items-center gap-2 bg-white text-emerald-600 px-6 py-3 rounded-xl font-bold hover:shadow-lg transition-all transform hover:scale-105">
+                                Gestionar Usuarios
+                                <Users size={18} />
+                            </Link>
+                        </div>
+                        <div className="absolute -right-8 -bottom-8 opacity-10 transform rotate-12 group-hover:scale-110 transition-transform">
+                            <Users size={200} />
+                        </div>
+                    </div>
                 </div>
 
                 {/* System Health / Status */}

@@ -19,6 +19,37 @@ export const listUsers = async (req: Request, res: Response) => {
     }
 };
 
+export const updateUser = async (req: Request, res: Response) => {
+    const id = req.params.id as string;
+    const { name, email, role, password } = req.body;
+    try {
+        const data: any = { name, email, role };
+        if (password) {
+            const bcrypt = require('bcryptjs');
+            data.password = await bcrypt.hash(password, 10);
+        }
+        const user = await prisma.user.update({
+            where: { id },
+            data
+        });
+        res.json(user);
+    } catch (error) {
+        console.error('[updateUser]', error);
+        res.status(500).json({ message: 'Error al actualizar usuario' });
+    }
+};
+
+export const deleteUser = async (req: Request, res: Response) => {
+    const id = req.params.id as string;
+    try {
+        await prisma.user.delete({ where: { id } });
+        res.status(204).send();
+    } catch (error) {
+        console.error('[deleteUser]', error);
+        res.status(500).json({ message: 'Error al eliminar usuario' });
+    }
+};
+
 // ─── Competencies ──────────────────────────────────────────────────────────
 
 export const createCompetency = async (req: Request, res: Response) => {
