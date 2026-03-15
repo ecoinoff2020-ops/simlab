@@ -98,6 +98,38 @@ export const listCompetencies = async (req: Request, res: Response) => {
     }
 };
 
+export const updateCompetency = async (req: Request, res: Response) => {
+    const id = req.params.id as string;
+    const { name, description } = req.body;
+    try {
+        const competency = await prisma.competency.update({
+            where: { id },
+            data: { name, description }
+        });
+        res.json(competency);
+    } catch (error) {
+        console.error('[updateCompetency]', error);
+        res.status(500).json({ message: 'Error al actualizar competencia' });
+    }
+};
+
+export const deleteCompetency = async (req: Request, res: Response) => {
+    const id = req.params.id as string;
+    try {
+        await prisma.competency.delete({ where: { id } });
+        res.status(204).send();
+    } catch (error: any) {
+        console.error('[deleteCompetency]', error);
+        if (error.code === 'P2003') {
+            res.status(400).json({
+                message: 'No se puede eliminar la competencia porque tiene preguntas asociadas. Elimina las preguntas primero.'
+            });
+            return;
+        }
+        res.status(500).json({ message: 'Error al eliminar competencia' });
+    }
+};
+
 // ─── Exams ─────────────────────────────────────────────────────────────────
 
 export const createExam = async (req: Request, res: Response) => {
@@ -229,18 +261,50 @@ export const listQuestionsByExam = async (req: Request, res: Response) => {
 
 export const updateQuestion = async (req: Request, res: Response) => {
     const id = req.params.id as string;
-    const { questionText, points, correctAnswer } = req.body;
+    const { examId, competencyId, type, questionText, correctAnswer, points, options } = req.body;
+
     try {
-        const question = await prisma.question.update({
-            where: { id },
-            data: {
-                questionText,
-                points: points ? parseInt(points) : undefined,
-                correctAnswer
-            },
-            include: { options: true }
+        const result = await prisma.$transaction(async (tx) => {
+            // 1. Eliminar opciones existentes si es necesario (para recrearlas o por cambio de tipo)
+            await tx.option.deleteMany({ where: { questionId: id } });
+
+            // 2. Actualizar datos básicos de la pregunta
+            const question = await tx.question.update({
+                where: { id },
+                data: {
+                    competencyId,
+                    type,
+                    questionText,
+                    correctAnswer: type === 'OPEN' ? correctAnswer : (type === 'TRUE_FALSE' ? correctAnswer : null),
+                    points: points ? parseInt(points) : 1,
+                }
+            });
+
+            // 3. Recrear opciones si aplica
+            if (type === 'MULTIPLE_CHOICE' && options) {
+                await tx.option.createMany({
+                    data: options.map((o: any) => ({
+                        questionId: id,
+                        optionText: o.optionText,
+                        isCorrect: !!o.isCorrect
+                    }))
+                });
+            } else if (type === 'TRUE_FALSE') {
+                await tx.option.createMany({
+                    data: [
+                        { questionId: id, optionText: 'Verdadero', isCorrect: correctAnswer === 'true' },
+                        { questionId: id, optionText: 'Falso', isCorrect: correctAnswer === 'false' }
+                    ]
+                });
+            }
+
+            return tx.question.findUnique({
+                where: { id },
+                include: { options: true }
+            });
         });
-        res.json(question);
+
+        res.json(result);
     } catch (error) {
         console.error('[updateQuestion]', error);
         res.status(500).json({ message: 'Error al actualizar pregunta' });

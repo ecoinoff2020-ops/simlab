@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { body } from 'express-validator';
 import {
     createExam, listExams, updateExam, deleteExam,
-    createCompetency, listCompetencies,
+    createCompetency, listCompetencies, updateCompetency, deleteCompetency,
     createQuestion, listQuestionsByExam, updateQuestion, deleteQuestion,
     getGlobalStats, exportIndividualPDF, exportMassiveExcel,
     getDashboardStats, listUsers, updateUser, deleteUser
@@ -30,6 +30,8 @@ router.get('/competencies', listCompetencies);
 router.post('/competencies', [
     body('name').notEmpty().withMessage('El nombre es requerido')
 ], createCompetency);
+router.put('/competencies/:id', updateCompetency);
+router.delete('/competencies/:id', deleteCompetency);
 
 // ─── Preguntas ─────────────────────────────────────────────────────────────
 router.get('/questions/exam/:examId', listQuestionsByExam);

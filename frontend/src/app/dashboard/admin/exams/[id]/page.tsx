@@ -55,6 +55,8 @@ export default function ExamDetailPage() {
     const [competencies, setCompetencies] = useState<Competency[]>([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editQuestionId, setEditQuestionId] = useState<string | null>(null);
 
     // Form states
     const [qType, setQType] = useState<'MULTIPLE_CHOICE' | 'TRUE_FALSE' | 'OPEN'>('MULTIPLE_CHOICE');
@@ -73,12 +75,11 @@ export default function ExamDetailPage() {
         const fetchData = async () => {
             try {
                 const [examRes, questionsRes, compRes] = await Promise.all([
-                    api.get(`admin/exams`), // This usually lists all, we need a single one if exists
+                    api.get(`admin/exams`),
                     api.get(`admin/questions/exam/${examId}`),
                     api.get('admin/competencies')
                 ]);
 
-                // Assuming we can find the exam from the list for now if there's no /admin/exams/:id
                 const currentExam = examRes.data.find((e: Exam) => e.id === examId);
                 setExam(currentExam || null);
                 setQuestions(questionsRes.data);
@@ -114,7 +115,7 @@ export default function ExamDetailPage() {
         })));
     };
 
-    const handleCreateQuestion = async (e: React.FormEvent) => {
+    const handleSubmitQuestion = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
             const payload = {
@@ -127,14 +128,44 @@ export default function ExamDetailPage() {
                 options: qType === 'MULTIPLE_CHOICE' ? qOptions : []
             };
 
-            const res = await api.post('admin/questions', payload);
-            setQuestions([...questions, res.data]);
+            if (isEditing && editQuestionId) {
+                const res = await api.put(`admin/questions/${editQuestionId}`, payload);
+                setQuestions(questions.map(q => q.id === editQuestionId ? res.data : q));
+                alert('Pregunta actualizada exitosamente');
+            } else {
+                const res = await api.post('admin/questions', payload);
+                setQuestions([...questions, res.data]);
+                alert('Pregunta creada exitosamente');
+            }
             setShowForm(false);
             resetForm();
         } catch (error) {
-            console.error('Error creating question', error);
-            alert('Error al crear la pregunta. Revisa los campos.');
+            console.error('Error saving question', error);
+            alert('Error al guardar la pregunta. Revisa los campos.');
         }
+    };
+
+    const handleEditQuestion = (q: Question) => {
+        setIsEditing(true);
+        setEditQuestionId(q.id);
+        setQType(q.type);
+        setQText(q.questionText);
+        setQPoints(q.points);
+
+        const comp = competencies.find(c => c.name === q.competency.name);
+        if (comp) setQCompetencyId(comp.id);
+
+        if (q.type === 'MULTIPLE_CHOICE') {
+            setQOptions(q.options.map(o => ({ optionText: o.optionText, isCorrect: o.isCorrect })));
+        } else if (q.type === 'TRUE_FALSE') {
+            const correctOpt = q.options.find(o => o.isCorrect);
+            setQCorrectAnswer(correctOpt?.optionText === 'Verdadero' ? 'true' : 'false');
+        } else if (q.type === 'OPEN') {
+            setQCorrectAnswer((q as any).correctAnswer || '');
+        }
+
+        setShowForm(true);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     const handleDeleteQuestion = async (qId: string) => {
@@ -158,6 +189,8 @@ export default function ExamDetailPage() {
             { optionText: '', isCorrect: false },
         ]);
         setQCorrectAnswer('');
+        setIsEditing(false);
+        setEditQuestionId(null);
     };
 
     if (loading) return (
@@ -206,12 +239,12 @@ export default function ExamDetailPage() {
                         exit={{ opacity: 0, scale: 0.95 }}
                         className="bg-white rounded-3xl p-8 border border-slate-100 shadow-xl shadow-slate-200/50"
                     >
-                        <form onSubmit={handleCreateQuestion} className="space-y-6">
+                        <form onSubmit={handleSubmitQuestion} className="space-y-6">
                             <div className="flex justify-between items-center mb-4">
-                                <h3 className="text-xl font-bold text-slate-900">Nueva Pregunta</h3>
+                                <h3 className="text-xl font-bold text-slate-900">{isEditing ? 'Editar Pregunta' : 'Nueva Pregunta'}</h3>
                                 <button
                                     type="button"
-                                    onClick={() => setShowForm(false)}
+                                    onClick={() => { setShowForm(false); resetForm(); }}
                                     className="text-slate-400 hover:text-slate-600 text-sm font-bold"
                                 >
                                     Cancelar
@@ -363,7 +396,7 @@ export default function ExamDetailPage() {
                                     className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-xl font-bold transition-all shadow-lg"
                                 >
                                     <Save size={18} />
-                                    Guardar Pregunta
+                                    {isEditing ? 'Actualizar Pregunta' : 'Guardar Pregunta'}
                                 </button>
                             </div>
                         </form>
@@ -424,8 +457,16 @@ export default function ExamDetailPage() {
                                     </div>
                                     <div className="flex flex-col gap-2">
                                         <button
+                                            onClick={() => handleEditQuestion(q)}
+                                            className="p-2 text-indigo-400 hover:text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition-all"
+                                            title="Editar pregunta"
+                                        >
+                                            <Edit3 size={20} />
+                                        </button>
+                                        <button
                                             onClick={() => handleDeleteQuestion(q.id)}
                                             className="p-2 text-slate-300 hover:text-red-500 bg-slate-50 hover:bg-red-50 rounded-xl transition-all"
+                                            title="Eliminar pregunta"
                                         >
                                             <Trash2 size={20} />
                                         </button>
