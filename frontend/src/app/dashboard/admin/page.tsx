@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import {
-    Users,
+    Users as UsersIcon,
     BookOpen,
     CheckCircle2,
     TrendingUp,
@@ -42,7 +42,7 @@ export default function AdminDashboard() {
     }, []);
 
     const cards = [
-        { name: 'Usuarios Totales', value: stats?.usersCount || 0, icon: Users, color: 'bg-blue-500', trend: '+12%' },
+        { name: 'Usuarios Totales', value: stats?.usersCount || 0, icon: UsersIcon, color: 'bg-blue-500', trend: '+12%' },
         { name: 'Exámenes Activos', value: stats?.examsCount || 0, icon: BookOpen, color: 'bg-indigo-500', trend: '+2 nuevos' },
         { name: 'Simulaciones Realizadas', value: stats?.attemptsCount || 0, icon: CheckCircle2, color: 'bg-emerald-500', trend: '+8 hoy' },
         { name: 'Promedio General', value: `${stats?.avgScore || 0}%`, icon: TrendingUp, color: 'bg-amber-500', trend: 'Estable' },
@@ -110,7 +110,7 @@ export default function AdminDashboard() {
                             <Link href="/dashboard/admin/users" className="flex items-center justify-between p-4 bg-emerald-50 rounded-xl hover:bg-emerald-100 transition-colors group">
                                 <div className="flex items-center gap-4">
                                     <div className="p-2 bg-white rounded-lg shadow-sm">
-                                        <Users size={20} className="text-emerald-600" />
+                                        <UsersIcon size={20} className="text-emerald-600" />
                                     </div>
                                     <div>
                                         <h4 className="font-bold text-slate-900">Gestionar Usuarios</h4>
@@ -155,11 +155,11 @@ export default function AdminDashboard() {
                             <p className="text-emerald-100 mb-6 max-w-sm">Administra las cuentas de docentes y administradores, edita sus perfiles o elimínalos del sistema.</p>
                             <Link href="/dashboard/admin/users" className="inline-flex items-center gap-2 bg-white text-emerald-600 px-6 py-3 rounded-xl font-bold hover:shadow-lg transition-all transform hover:scale-105">
                                 Gestionar Usuarios
-                                <Users size={18} />
+                                <UsersIcon size={18} />
                             </Link>
                         </div>
                         <div className="absolute -right-8 -bottom-8 opacity-10 transform rotate-12 group-hover:scale-110 transition-transform">
-                            <Users size={200} />
+                            <UsersIcon size={200} />
                         </div>
                     </div>
                 </div>

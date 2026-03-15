@@ -3,6 +3,7 @@ import { prisma } from '../lib/prisma';
 import { validationResult } from 'express-validator';
 import { calculateGlobalStats } from '../services/statsService';
 import { generateIndividualPDF, generateMassiveExcel } from '../services/reportService';
+import bcrypt from 'bcryptjs';
 
 // ─── Users ──────────────────────────────────────────────────────────────
 
@@ -25,8 +26,7 @@ export const updateUser = async (req: Request, res: Response) => {
     try {
         const data: any = { name, email, role };
         if (password) {
-            const bcrypt = require('bcryptjs');
-            data.password = await bcrypt.hash(password, 10);
+            data.password_hash = await bcrypt.hash(password, 10);
         }
         const user = await prisma.user.update({
             where: { id },
@@ -41,12 +41,35 @@ export const updateUser = async (req: Request, res: Response) => {
 
 export const deleteUser = async (req: Request, res: Response) => {
     const id = req.params.id as string;
+    const currentUser = (req as any).user;
+
     try {
+        // Evitar que un administrador se elimine a sí mismo
+        if (currentUser && id === currentUser.id) {
+            res.status(400).json({ message: 'No puedes eliminar tu propia cuenta de administrador' });
+            return;
+        }
+
         await prisma.user.delete({ where: { id } });
         res.status(204).send();
-    } catch (error) {
-        console.error('[deleteUser]', error);
-        res.status(500).json({ message: 'Error al eliminar usuario' });
+    } catch (error: any) {
+        console.error('[deleteUser] Full error detail:', error);
+
+        // Error P2025 de Prisma: El registro no existe
+        if (error.code === 'P2025') {
+            res.status(404).json({ message: 'El usuario ya no existe' });
+            return;
+        }
+
+        // Error P2003 de Prisma: Violación de restricción de clave foránea
+        if (error.code === 'P2003') {
+            res.status(400).json({
+                message: 'No se puede eliminar el usuario porque tiene registros dependientes. Asegúrate de eliminar sus intentos primero.'
+            });
+            return;
+        }
+
+        res.status(500).json({ message: 'Error interno al intentar eliminar el usuario' });
     }
 };
 
