@@ -207,6 +207,19 @@ export const finishExam = async (req: Request, res: Response) => {
             }
         });
 
+        // Obtener el intento actualizado con las respuestas ya evaluadas para el desglose
+        const finalAttempt = await prisma.attempt.findUnique({
+            where: { id: attemptId },
+            include: {
+                answers: true,
+                exam: {
+                    include: {
+                        questions: { include: { competency: true, options: true } }
+                    }
+                }
+            }
+        });
+
         res.json({
             message: 'Examen finalizado',
             attemptId: updatedAttempt.id,
@@ -214,7 +227,7 @@ export const finishExam = async (req: Request, res: Response) => {
             levelEstimated: updatedAttempt.levelEstimated,
             totalQuestions,
             correctAnswers: correctAnswersCount,
-            breakdownByCompetency: calculateCompetencyBreakdown(attempt)
+            breakdownByCompetency: calculateCompetencyBreakdown(finalAttempt)
         });
     } catch (error) {
         console.error('[finishExam]', error);
