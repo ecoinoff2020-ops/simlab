@@ -82,82 +82,26 @@ export default function RegisterPage() {
                         </div>
                     )}
 
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        <div className="space-y-2">
-                            <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Nombre Completo</label>
-                            <div className="relative group">
-                                <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-                                <input
-                                    name="name"
-                                    type="text"
-                                    required
-                                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-slate-50 rounded-2xl outline-none focus:border-indigo-600 focus:bg-white transition-all"
-                                    placeholder="Juan Pérez"
-                                    value={formData.name}
-                                    onChange={handleChange}
-                                />
-                            </div>
+                    <div className="space-y-6 text-center py-4">
+                        <div className="bg-amber-50 border border-amber-100 p-6 rounded-3xl">
+                            <ShieldCheck className="mx-auto text-amber-500 mb-4" size={48} />
+                            <h3 className="text-xl font-bold text-slate-900 mb-2">Registro Restringido</h3>
+                            <p className="text-slate-600 font-medium leading-relaxed">
+                                El registro en <b>SimLab</b> es exclusivo para clientes con suscripción activa.
+                            </p>
                         </div>
 
-                        <div className="space-y-2">
-                            <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Email Académico</label>
-                            <div className="relative group">
-                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-                                <input
-                                    name="email"
-                                    type="email"
-                                    required
-                                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-slate-50 rounded-2xl outline-none focus:border-indigo-600 focus:bg-white transition-all"
-                                    placeholder="tu@universidad.com"
-                                    value={formData.email}
-                                    onChange={handleChange}
-                                />
-                            </div>
-                        </div>
+                        <div className="pt-4">
+                            <h4 className="font-bold text-slate-900 mb-2">¿Deseas implementar SimLab en tu institución?</h4>
+                            <p className="text-sm text-slate-500 mb-6 font-medium">Contáctanos para obtener una demo y conocer nuestros planes comerciales.</p>
 
-                        <div className="space-y-2">
-                            <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Contraseña</label>
-                            <div className="relative group">
-                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-                                <input
-                                    name="password"
-                                    type="password"
-                                    required
-                                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-slate-50 rounded-2xl outline-none focus:border-indigo-600 focus:bg-white transition-all"
-                                    placeholder="Mínimo 8 caracteres"
-                                    value={formData.password}
-                                    onChange={handleChange}
-                                />
-                            </div>
+                            <a
+                                href="mailto:ecoinoff2020@gmail.com"
+                                className="w-full inline-flex items-center justify-center gap-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black py-4 rounded-2xl shadow-xl transition-all active:scale-[0.98]"
+                            >
+                                Contactar Comercial <ArrowRight size={20} />
+                            </a>
                         </div>
-
-                        <div className="space-y-2">
-                            <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Tu Rol en SimLab</label>
-                            <div className="relative">
-                                <BookOpen className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-                                <select
-                                    name="role"
-                                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-slate-50 rounded-2xl outline-none focus:border-indigo-600 focus:bg-white transition-all"
-                                    value={formData.role}
-                                    onChange={handleChange}
-                                >
-                                    <option value="docente">Soy Docente</option>
-                                    <option value="admin">Soy Administrador</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="w-full flex items-center justify-center gap-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black py-4 rounded-2xl shadow-xl transition-all disabled:opacity-50"
-                        >
-                            {loading ? (
-                                <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                            ) : (
-                                <>Crear mi Cuenta <UserPlus size={20} /></>
-                            )}
-                        </button>
 
                         <div className="pt-8 text-center border-t border-slate-100">
                             <p className="text-slate-500 font-medium text-sm">
@@ -165,7 +109,7 @@ export default function RegisterPage() {
                                 <Link href="/login" className="text-indigo-600 font-bold hover:underline">Inicia sesión aquí</Link>
                             </p>
                         </div>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>

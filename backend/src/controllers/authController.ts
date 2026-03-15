@@ -28,13 +28,13 @@ export const register = async (req: Request, res: Response): Promise<void> => {
         // Hashear contraseña
         const password_hash = await bcrypt.hash(password, SALT_ROUNDS);
 
-        // Crear usuario
+        // Crear usuario forzando el rol de docente para registros públicos
         const user = await prisma.user.create({
             data: {
                 name,
                 email,
                 password_hash,
-                role: role === 'admin' ? 'admin' : 'docente',
+                role: 'docente', // No permitimos registrar administradores públicamente
             },
             select: {
                 id: true,
